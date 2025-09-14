@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,8 +16,19 @@ public class AuthController(IMediator mediator , Context context) : ControllerBa
     [HttpPost("signin")]
     public async Task<ActionResult<SignInResponseDto>> SignIn([FromBody] SignInRequestDto request)
     {
-        var result = await mediator.Send(new SignInCommand(request));
-        return Ok(result);
+        try
+        {
+            var result = await mediator.Send(new SignInCommand(request));
+            return Ok(result);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = "Something went wrong: " + ex.Message });
+        }
     }
 
     [HttpPost("signup")]
@@ -50,13 +61,14 @@ public class AuthController(IMediator mediator , Context context) : ControllerBa
         var user = await context.Users.FindAsync(id);
         if (user == null)
         {
-            throw new Exception();
+            return NotFound(new { message = "User not found" });
         }
 
         return Ok(user);    
     }
 
     [HttpGet("me")]
+    [Authorize]
     public async Task<IActionResult> Me()
     {
         var userIdClaim = User.FindFirst("user_id")?.Value;

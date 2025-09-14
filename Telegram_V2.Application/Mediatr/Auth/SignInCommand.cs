@@ -1,5 +1,6 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System;
 using Telegram_V2.Application.Services;
 using Telegram_V2.Core.Dtos;
 using Telegram_V2.Infrastructure.Database;
@@ -28,11 +29,19 @@ public class SignInCommandHandler(
             throw new UnauthorizedAccessException("Invalid email or password.");
         }
 
+        // Simple password validation (in production, use proper password hashing)
+        if (user.Password != request.Password)
+        {
+            throw new UnauthorizedAccessException("Invalid email or password.");
+        }
+
         var token = authService.GetToken(user);
 
         return new SignInResponseDto()
         {
             AccessToken = token,
+            RefreshToken = string.Empty, // Implement refresh token logic if needed
+            ExpiresIn = 86400 // 24 hours in seconds
         };
     }
 }

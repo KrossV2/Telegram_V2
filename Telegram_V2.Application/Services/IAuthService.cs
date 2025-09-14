@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -31,8 +31,8 @@ public class AuthService(IOptions<JwtSettings> settings) : IAuthService
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            "TelegramV2",
-            "TelegramV2",
+            _settings.Value.Issuer,
+            _settings.Value.Audience,
             claims: claims,
             expires: DateTime.UtcNow.Add(TimeSpan.FromDays(1)),
             signingCredentials: credentials
