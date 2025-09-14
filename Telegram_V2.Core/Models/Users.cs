@@ -1,4 +1,6 @@
-﻿namespace Telegram_V2.Core.Models;
+﻿using System.Text.Json.Serialization;
+
+namespace Telegram_V2.Core.Models;
 
 public class Users
 {
@@ -15,12 +17,20 @@ public class Users
     public DateTime UpdatedAt { get; set; }
 
     // Navigation
+    [JsonIgnore]
     public ICollection<Contact> Contacts { get; set; }
+    [JsonIgnore]
     public ICollection<ChatParticipant> ChatParticipants { get; set; }
+    [JsonIgnore]
     public ICollection<Message> Messages { get; set; }
+    [JsonIgnore]
     public ICollection<Notification> Notifications { get; set; }
+    [JsonIgnore]
     public ICollection<MessageReaction> Reactions { get; set; }
+    [JsonIgnore]
     public ICollection<MessageStatus> MessageStatuses { get; set; }
+    [JsonIgnore]
     public ICollection<BlockedUser> BlockedUsers { get; set; }
+    [JsonIgnore]
     public ICollection<CallHistory> CallHistories { get; set; }
 }

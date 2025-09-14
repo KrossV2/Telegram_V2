@@ -1,0 +1,45 @@
+﻿using MediatR;
+using Microsoft.AspNetCore.Identity;
+using Telegram_V2.Core.Dtos;
+using Telegram_V2.Core.Models;
+using Telegram_V2.Infrastructure.Database;
+
+namespace Telegram_V2.Application.Mediatr.Auth;
+
+
+public class SignUpCommand(UserCreateDto request) : IRequest<UserDto>
+{
+    public UserCreateDto Request { get; } = request;
+}
+
+public class SignUpCommandHandler (Context context) : IRequestHandler<SignUpCommand, UserDto>
+{
+    public async Task<UserDto> Handle(SignUpCommand command, CancellationToken cancellationToken)
+    {
+        var request = command.Request;
+
+        var user = new Users()
+        {
+            UserName = request.UserName,
+            PhoneNumber = request.PhoneNumber,
+            Email = request.Email,
+            Password = request.Password,
+            ProfilePhotoUrl = request.ProfilePhotoUrl,
+            Bio = request.Bio,
+        };
+
+        context.Users.Add(user);
+        await context.SaveChangesAsync();
+
+        return new UserDto
+        {
+            Id = user.Id,
+            UserName = user.UserName,
+            PhoneNumber = user.PhoneNumber,
+            Email = user.Email,
+            ProfilePhotoUrl = user.ProfilePhotoUrl,
+            Bio = user.Bio,
+            LastSeen = DateTime.Now
+        };
+    }
+}
