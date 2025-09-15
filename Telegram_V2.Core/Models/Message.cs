@@ -9,6 +9,7 @@ public class Message
     public string? FileUrl { get; set; }
     public int? ReplyToMessageId { get; set; }
     public bool IsEdited { get; set; }
+    public bool IsDeleted { get; set; }
     public DateTime CreatedAt { get; set; }
 
     // Navigation

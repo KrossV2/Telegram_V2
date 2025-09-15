@@ -25,6 +25,8 @@ public class AuthService(IOptions<JwtSettings> settings) : IAuthService
         new Claim("user_id", user.Id.ToString()),
         new Claim("email", user.Email),
         new Claim("username", user.UserName),
+        new Claim("firstname", user.FirstName),
+        new Claim("lastname", user.LastName),
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Value.Key));

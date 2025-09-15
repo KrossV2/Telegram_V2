@@ -12,6 +12,9 @@ public class Users
     public string? ProfilePhotoUrl { get; set; }
     public string? Bio { get; set; }
     public bool IsOnline { get; set; }
+    public string? FirstName { get; set; }
+    public string? LastName { get; set; }
+    public bool IsBot { get; set; }
     public DateTime LastSeen { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }

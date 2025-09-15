@@ -6,4 +6,6 @@ public class ChatDto
     public bool IsGroup { get; set; }
     public int CreatedById { get; set; }
     public DateTime CreatedAt { get; set; }
+    public string? ChatName { get; set; } // Grup nomi uchun
+    public string? ChatPhotoUrl { get; set; } // Grup rasmi uchun
 }

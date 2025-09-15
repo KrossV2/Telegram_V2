@@ -2,7 +2,6 @@
 
 public enum CallType
 {
-    Voice = 1 ,
-    Video = 2 ,
-
+    Voice,
+    Video
 }

@@ -7,5 +7,4 @@ public class UserUpdateDto
     public string? Email { get; set; }
     public string? ProfilePhotoUrl { get; set; }
     public string? Bio { get; set; }
-    public bool? IsOnline { get; set; }
 }
