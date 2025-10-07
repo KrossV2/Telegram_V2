@@ -139,7 +139,6 @@ public class ChatsController : ControllerBase
         // Group settings yaratish
         var groupSettings = new GroupSettings
         {
-            GroupId = chat.Id,
             ChatId = chat.Id,
             GroupName = dto.GroupName,
             Description = dto.Description,

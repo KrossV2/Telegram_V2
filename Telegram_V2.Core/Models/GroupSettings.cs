@@ -2,7 +2,6 @@
 
 public class GroupSettings
 {
-    public int GroupId { get; set; }
     public int ChatId { get; set; }
     public string GroupName { get; set; }
     public string? GroupPhotoUrl { get; set; }

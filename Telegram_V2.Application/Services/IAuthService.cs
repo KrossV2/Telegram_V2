@@ -21,25 +21,28 @@ public class AuthService(IOptions<JwtSettings> settings) : IAuthService
     public string GetToken(Users user)
     {
         var claims = new List<Claim>
-        {
+    {
         new Claim("user_id", user.Id.ToString()),
-        new Claim("email", user.Email),
-        new Claim("username", user.UserName),
-        new Claim("firstname", user.FirstName),
-        new Claim("lastname", user.LastName),
-        };
+
+        // null bo‘lsa string.Empty qo‘yib yuboramiz
+        new Claim("email", user.Email ?? string.Empty),
+        new Claim("username", user.UserName ?? string.Empty),
+        new Claim("firstname", user.FirstName ?? string.Empty),
+        new Claim("lastname", user.LastName ?? string.Empty),
+    };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Value.Key));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            "TelegramV2",
-            "TelegramV2",
+            issuer: "TelegramV2",
+            audience: "TelegramV2",
             claims: claims,
-            expires: DateTime.UtcNow.Add(TimeSpan.FromDays(1)),
+            expires: DateTime.UtcNow.AddDays(1),
             signingCredentials: credentials
         );
 
         return _handler.WriteToken(token);
     }
+
 }

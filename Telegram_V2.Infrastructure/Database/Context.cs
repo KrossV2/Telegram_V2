@@ -138,13 +138,16 @@ namespace Telegram_V2.Infrastructure.Database
             // GroupSettings
             modelBuilder.Entity<GroupSettings>(entity =>
             {
-                entity.HasKey(g => g.GroupId);
+                // ChatId ni PK qilamiz
+                entity.HasKey(g => g.ChatId);
 
+                // 1:1 relationship Chat ↔ GroupSettings
                 entity.HasOne(g => g.Chat)
-                      .WithMany()
-                      .HasForeignKey(g => g.ChatId)
+                      .WithOne(c => c.GroupSettings)
+                      .HasForeignKey<GroupSettings>(g => g.ChatId)
                       .OnDelete(DeleteBehavior.Cascade);
             });
+
 
             // Message
             modelBuilder.Entity<Message>(entity =>

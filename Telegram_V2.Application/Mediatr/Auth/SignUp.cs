@@ -25,6 +25,8 @@ public class SignUpCommandHandler (Context context) : IRequestHandler<SignUpComm
             Email = request.Email,
             Password = request.Password,
             ProfilePhotoUrl = request.ProfilePhotoUrl,
+            FirstName = request.FirstName,
+            LastName = request.LastName,
             Bio = request.Bio,
         };
 
@@ -39,6 +41,8 @@ public class SignUpCommandHandler (Context context) : IRequestHandler<SignUpComm
             Email = user.Email,
             ProfilePhotoUrl = user.ProfilePhotoUrl,
             Bio = user.Bio,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
             LastSeen = DateTime.Now
         };
     }

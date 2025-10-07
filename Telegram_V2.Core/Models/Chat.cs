@@ -17,5 +17,5 @@ public class Chat
     public ICollection<PinnedMessage> PinnedMessages { get; set; }
 
     // Group uchun propertylar
-    public GroupSettings GroupSettings { get; set; }
+    public GroupSettings? GroupSettings { get; set; }
 }

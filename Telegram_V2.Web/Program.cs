@@ -20,6 +20,18 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddSignalR();
 
+//Cors
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:8080") // faqat frontingizga ruxsat
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials(); // agar cookie yoki auth kerak bo‘lsa
+    });
+});
+
 // Di
 builder.Services.AddDependencies()
     .AddDatabase(configurations);
@@ -105,6 +117,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("AllowFrontend");
 
 app.UseRouting();
 

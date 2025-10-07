@@ -130,6 +130,12 @@ namespace Telegram_V2.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ChatName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ChatPhotoUrl")
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -236,12 +242,6 @@ namespace Telegram_V2.Infrastructure.Migrations
 
             modelBuilder.Entity("Telegram_V2.Core.Models.GroupSettings", b =>
                 {
-                    b.Property<int>("GroupId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("GroupId"));
-
                     b.Property<int>("ChatId")
                         .HasColumnType("integer");
 
@@ -258,9 +258,7 @@ namespace Telegram_V2.Infrastructure.Migrations
                     b.Property<string>("GroupPhotoUrl")
                         .HasColumnType("text");
 
-                    b.HasKey("GroupId");
-
-                    b.HasIndex("ChatId");
+                    b.HasKey("ChatId");
 
                     b.ToTable("GroupSettings");
                 });
@@ -281,6 +279,9 @@ namespace Telegram_V2.Infrastructure.Migrations
 
                     b.Property<string>("FileUrl")
                         .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsEdited")
                         .HasColumnType("boolean");
@@ -435,8 +436,17 @@ namespace Telegram_V2.Infrastructure.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("text");
 
+                    b.Property<string>("FirstName")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsBot")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("IsOnline")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("LastSeen")
                         .HasColumnType("timestamp with time zone");
@@ -587,8 +597,8 @@ namespace Telegram_V2.Infrastructure.Migrations
             modelBuilder.Entity("Telegram_V2.Core.Models.GroupSettings", b =>
                 {
                     b.HasOne("Telegram_V2.Core.Models.Chat", "Chat")
-                        .WithMany()
-                        .HasForeignKey("ChatId")
+                        .WithOne("GroupSettings")
+                        .HasForeignKey("Telegram_V2.Core.Models.GroupSettings", "ChatId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -691,6 +701,8 @@ namespace Telegram_V2.Infrastructure.Migrations
 
             modelBuilder.Entity("Telegram_V2.Core.Models.Chat", b =>
                 {
+                    b.Navigation("GroupSettings");
+
                     b.Navigation("Messages");
 
                     b.Navigation("Participants");

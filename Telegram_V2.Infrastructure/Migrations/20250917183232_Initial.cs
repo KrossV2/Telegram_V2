@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Telegram_V2.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -25,6 +25,9 @@ namespace Telegram_V2.Infrastructure.Migrations
                     ProfilePhotoUrl = table.Column<string>(type: "text", nullable: true),
                     Bio = table.Column<string>(type: "text", nullable: true),
                     IsOnline = table.Column<bool>(type: "boolean", nullable: false),
+                    FirstName = table.Column<string>(type: "text", nullable: true),
+                    LastName = table.Column<string>(type: "text", nullable: true),
+                    IsBot = table.Column<bool>(type: "boolean", nullable: false),
                     LastSeen = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
@@ -100,7 +103,9 @@ namespace Telegram_V2.Infrastructure.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     IsGroup = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedById = table.Column<int>(type: "integer", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ChatName = table.Column<string>(type: "text", nullable: true),
+                    ChatPhotoUrl = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -225,8 +230,6 @@ namespace Telegram_V2.Infrastructure.Migrations
                 name: "GroupSettings",
                 columns: table => new
                 {
-                    GroupId = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ChatId = table.Column<int>(type: "integer", nullable: false),
                     GroupName = table.Column<string>(type: "text", nullable: false),
                     GroupPhotoUrl = table.Column<string>(type: "text", nullable: true),
@@ -235,7 +238,7 @@ namespace Telegram_V2.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GroupSettings", x => x.GroupId);
+                    table.PrimaryKey("PK_GroupSettings", x => x.ChatId);
                     table.ForeignKey(
                         name: "FK_GroupSettings_Chats_ChatId",
                         column: x => x.ChatId,
@@ -256,6 +259,7 @@ namespace Telegram_V2.Infrastructure.Migrations
                     FileUrl = table.Column<string>(type: "text", nullable: true),
                     ReplyToMessageId = table.Column<int>(type: "integer", nullable: true),
                     IsEdited = table.Column<bool>(type: "boolean", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -445,11 +449,6 @@ namespace Telegram_V2.Infrastructure.Migrations
                 name: "IX_FileAttachments_MessageId",
                 table: "FileAttachments",
                 column: "MessageId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_GroupSettings_ChatId",
-                table: "GroupSettings",
-                column: "ChatId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MessageReactions_MessageId",
