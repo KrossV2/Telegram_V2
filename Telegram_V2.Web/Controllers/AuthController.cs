@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Telegram_V2.Application.Exceptions;
 using Telegram_V2.Application.Mediatr.Auth;
 using Telegram_V2.Core.Dtos;
 using Telegram_V2.Core.Models;
@@ -16,8 +17,15 @@ public class AuthController(IMediator mediator , Context context) : ControllerBa
     [HttpPost("signin")]
     public async Task<ActionResult<SignInResponseDto>> SignIn([FromBody] SignInRequestDto request)
     {
-        var result = await mediator.Send(new SignInCommand(request));
-        return Ok(result);
+        try
+        {
+            var result = await mediator.Send(new SignInCommand(request));
+            return Ok(result);
+        }
+        catch (AuthException ex)
+        {
+            return Unauthorized(new { message = ex.Message });
+        }
     }
 
     [HttpPost("signup")]

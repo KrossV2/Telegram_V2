@@ -12,7 +12,7 @@ public class SignUpCommand(UserCreateDto request) : IRequest<UserDto>
     public UserCreateDto Request { get; } = request;
 }
 
-public class SignUpCommandHandler (Context context) : IRequestHandler<SignUpCommand, UserDto>
+public class SignUpCommandHandler (Context context, IPasswordHasher<Users> passwordHasher) : IRequestHandler<SignUpCommand, UserDto>
 {
     public async Task<UserDto> Handle(SignUpCommand command, CancellationToken cancellationToken)
     {
@@ -23,12 +23,13 @@ public class SignUpCommandHandler (Context context) : IRequestHandler<SignUpComm
             UserName = request.UserName,
             PhoneNumber = request.PhoneNumber,
             Email = request.Email,
-            Password = request.Password,
             ProfilePhotoUrl = request.ProfilePhotoUrl,
             FirstName = request.FirstName,
             LastName = request.LastName,
             Bio = request.Bio,
         };
+
+        user.Password = passwordHasher.HashPassword(user, request.Password);
 
         context.Users.Add(user);
         await context.SaveChangesAsync();

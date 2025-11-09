@@ -10,6 +10,7 @@ namespace Telegram_V2.Infrastructure.Hubs
     {
         private readonly Context _context;
         private static readonly ConcurrentDictionary<int, HashSet<string>> _userConnections = new();
+        private static readonly ConcurrentDictionary<string, int> _connectionToUserMap = new();
 
         public ChatHub(Context context)
         {
@@ -27,6 +28,8 @@ namespace Telegram_V2.Infrastructure.Hubs
                     existingSet.Add(Context.ConnectionId);
                     return existingSet;
                 });
+
+            _connectionToUserMap.TryAdd(Context.ConnectionId, userId);
 
             // User statusini online qilish
             var user = await _context.Users.FindAsync(userId);
@@ -57,13 +60,22 @@ namespace Telegram_V2.Infrastructure.Hubs
             _context.Messages.Add(message);
             await _context.SaveChangesAsync();
 
+            var sender = await _context.Users.FindAsync(senderId);
+            var senderDto = new
+            {
+                sender?.Id,
+                sender?.UserName,
+                sender?.FirstName,
+                sender?.LastName
+            };
+
             // Receiverning barcha connectionlariga xabar yuborish
             if (_userConnections.TryGetValue(receiverId, out var receiverConnections))
             {
                 foreach (var connectionId in receiverConnections)
                 {
                     await Clients.Client(connectionId).SendAsync("ReceivePrivateMessage",
-                        senderId, messageText, message.CreatedAt, message.Id);
+                        senderDto, messageText, message.CreatedAt, message.Id);
                 }
             }
 
@@ -91,9 +103,18 @@ namespace Telegram_V2.Infrastructure.Hubs
             _context.Messages.Add(message);
             await _context.SaveChangesAsync();
 
+            var sender = await _context.Users.FindAsync(senderId);
+            var senderDto = new
+            {
+                sender?.Id,
+                sender?.UserName,
+                sender?.FirstName,
+                sender?.LastName
+            };
+
             // Guruh a'zolariga xabar yuborish
             await Clients.Group($"chat_{chatId}").SendAsync("ReceiveGroupMessage",
-                senderId, messageText, message.CreatedAt, message.Id);
+                senderDto, messageText, message.CreatedAt, message.Id);
 
             // Senderni o'ziga ham yuborish
             if (_userConnections.TryGetValue(senderId, out var senderConnections))
@@ -122,17 +143,15 @@ namespace Telegram_V2.Infrastructure.Hubs
         // ✅ Foydalanuvchi uzilganda
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
-            // Connectionni olib tashlash
-            foreach (var user in _userConnections)
+            if (_connectionToUserMap.TryRemove(Context.ConnectionId, out int userId))
             {
-                if (user.Value.Contains(Context.ConnectionId))
+                if (_userConnections.TryGetValue(userId, out var connections))
                 {
-                    user.Value.Remove(Context.ConnectionId);
-
-                    // Agar boshqa connection qolmagan bo'lsa, user offline
-                    if (user.Value.Count == 0)
+                    connections.Remove(Context.ConnectionId);
+                    if (connections.Count == 0)
                     {
-                        var userEntity = await _context.Users.FindAsync(user.Key);
+                        _userConnections.TryRemove(userId, out _);
+                        var userEntity = await _context.Users.FindAsync(userId);
                         if (userEntity != null)
                         {
                             userEntity.IsOnline = false;
@@ -140,7 +159,6 @@ namespace Telegram_V2.Infrastructure.Hubs
                             await _context.SaveChangesAsync();
                         }
                     }
-                    break;
                 }
             }
 

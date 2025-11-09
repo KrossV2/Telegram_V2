@@ -4,16 +4,20 @@ using Telegram_V2.Core.Models;
 using Telegram_V2.Infrastructure.Database;
 using Telegram_V2.Core.Enums;
 using Telegram_V2.Core.Dtos;
+using Microsoft.AspNetCore.SignalR;
+using Telegram_V2.Infrastructure.Hubs;
 
 [ApiController]
 [Route("api/calls")]
 public class CallsController : ControllerBase
 {
     private readonly Context _context;
+    private readonly IHubContext<ChatHub> _hubContext;
 
-    public CallsController(Context context)
+    public CallsController(Context context, IHubContext<ChatHub> hubContext)
     {
         _context = context;
+        _hubContext = hubContext;
     }
 
     // ✅ Yangi qo'ng'iroqni boshlash

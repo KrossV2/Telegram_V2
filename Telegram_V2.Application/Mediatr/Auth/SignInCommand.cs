@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Telegram_V2.Application.Services;
 using Telegram_V2.Core.Dtos;
 using Telegram_V2.Infrastructure.Database;
+using Telegram_V2.Application.Exceptions;
+using Microsoft.AspNetCore.Identity;
+using Telegram_V2.Core.Models;
 
 namespace Telegram_V2.Application.Mediatr.Auth;
 
@@ -13,7 +16,8 @@ public class SignInCommand(SignInRequestDto request) : IRequest<SignInResponseDt
 
 public class SignInCommandHandler(
     IAuthService authService,
-    Context context)
+    Context context,
+    IPasswordHasher<Users> passwordHasher)
     : IRequestHandler<SignInCommand, SignInResponseDto>
 {
     public async Task<SignInResponseDto> Handle(SignInCommand command, CancellationToken cancellationToken)
@@ -25,7 +29,14 @@ public class SignInCommandHandler(
                                    || u.UserName == request.EmailOrUsername, cancellationToken);
         if (user is null)
         {
-            throw new UnauthorizedAccessException("Invalid email or password.");
+            throw new AuthException("Invalid email or password.");
+        }
+
+        var passwordVerificationResult = passwordHasher.VerifyHashedPassword(user, user.Password, request.Password);
+
+        if (passwordVerificationResult == PasswordVerificationResult.Failed)
+        {
+            throw new AuthException("Invalid email or password.");
         }
 
         var token = authService.GetToken(user);
