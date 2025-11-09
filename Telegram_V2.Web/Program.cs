@@ -25,7 +25,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:8080") // faqat frontingizga ruxsat
+        policy.WithOrigins("http://localhost:5173") // faqat frontingizga ruxsat
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials(); // agar cookie yoki auth kerak bo‘lsa
