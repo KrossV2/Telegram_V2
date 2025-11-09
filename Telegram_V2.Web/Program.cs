@@ -23,13 +23,14 @@ builder.Services.AddSignalR();
 //Cors
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowFrontend", policy =>
-    {
-        policy.WithOrigins("http://localhost:5173") // faqat frontingizga ruxsat
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials(); // agar cookie yoki auth kerak bo‘lsa
-    });
+    options.AddPolicy("AllowAll",
+        policy =>
+        {
+            policy
+                .AllowAnyOrigin() // yoki .WithOrigins("http://localhost:8080")
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
 });
 
 // Di
@@ -116,7 +117,7 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseCors("AllowFrontend");
+app.UseCors("AllowAll");
 
 app.UseRouting();
 
